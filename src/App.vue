@@ -1,28 +1,46 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+  <v-app>
+    <div v-if="checkSession()">
+      <v-app-bar app>
+        Health tracker
+        <v-btn text fixed right @click="logout">LOGOUT</v-btn>
+      </v-app-bar>
+      <v-main>
+        <v-container fluid>
+          <!-- <router-view></router-view> -->
+        </v-container>
+      </v-main>
+    </div>
+    <WelcomeUser @login="onLogin" v-else></WelcomeUser>
+  </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import WelcomeUser from './components/WelcomeUser';
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    WelcomeUser,
+  },
+  data: () => ({}),
+  mounted() {
+    this.$axios.defaults.headers.common['Authorization'] = this.$session.get('auth')
+  },
+  methods: {
+    checkSession() {
+      return this.$session.exists()
+    },
+    logout() {
+      this.$session.destroy()
+      window.location.reload()
+    },
+    onLogin(token, auth) {
+      this.$session.start()
+      this.$session.set('jwt', token)
+      this.$session.set('auth', 'Basic ' + auth)
+      window.location.reload()
+    }
   }
-}
+};
 </script>
-
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
