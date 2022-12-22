@@ -1,11 +1,11 @@
 <template>
-  <v-data-table :headers="headers" :items="goals" sort-desc sort-by="started" class="elevation-1"
-                disable-pagination :loading="loadingGoals" loading-text="Loading goals" hide-default-footer
+  <v-data-table :headers="headers" :items="activities" sort-desc sort-by="started" class="elevation-1"
+                disable-pagination :loading="loadingActivities" loading-text="Loading activities" hide-default-footer
                 height="80vh" fixed-header>
     <template v-slot:top>
       <v-toolbar flat>
         <v-spacer/>
-        <v-dialog v-model="dialog" max-width="30vw" on>
+        <v-dialog v-model="dialog" max-width="30vw">
           <template v-slot:activator="{ on, attrs }">
             <v-btn v-bind="attrs" v-on="on" dark>
               <v-icon>mdi-plus</v-icon>
@@ -20,17 +20,16 @@
               <v-container>
                 <v-row>
                   <v-col cols="12">
-                    <v-select :items="activities" label="Select Activity" item-text="description" item-value="id"
-                              v-model="editedItem.activityId" :disabled="editedIndex >= 0" />
+                    <v-text-field v-model="editedItem.description" label="Description"/>
+                  </v-col>
+                  <v-col cols="6">
+                    <v-text-field v-model="editedItem.duration" label="Duration (minutes)" type="number"/>
+                  </v-col>
+                  <v-col cols="6">
+                    <v-text-field v-model="editedItem.calories" label="Calories burned" type="number"/>
                   </v-col>
                   <v-col cols="12">
-                    <v-text-field v-model="editedItem.target" label="Target in minutes" type="number"/>
-                    <v-subheader class="pl-0">Achieved</v-subheader>
-                  </v-col>
-                  <v-col cols="12">
-
-                    <v-slider min="0" height="50" :max="editedItem.target || 0" v-model="editedItem.current"
-                              thumb-label="always"/>
+                    <v-date-picker full-width show-current no-title v-model="editedItem.started"/>
                   </v-col>
                 </v-row>
               </v-container>
@@ -44,8 +43,7 @@
         </v-dialog>
         <v-dialog v-model="dialogDelete" max-width="30vw">
           <v-card>
-            <v-card-title class="text-subtitle-1 justify-center">
-              Are you sure you want to delete this goal?
+            <v-card-title class="text-subtitle-1 justify-center">Are you sure you want to delete this activity?
             </v-card-title>
             <v-card-actions>
               <v-spacer/>
@@ -57,59 +55,49 @@
         </v-dialog>
       </v-toolbar>
     </template>
-    <template v-slot:[`item.activityId`]="{ item }">
-      {{ activityName(item.activityId) }}
-    </template>
-    <template v-slot:[`item.target`]="{ item }">
-      {{ item.target + " " + item.unit }}
-    </template>
-    <template v-slot:[`item.current`]="{ item }">
-      <v-progress-linear :background-opacity="0.3" :buffer-value="100" :height="25" :width="150"
-                         :value="item.percent" color="success"
-      ><strong>{{ item.percent }}%</strong></v-progress-linear>
-    </template>
     <template v-slot:[`item.actions`]="{ item }">
       <v-icon small class="mr-2" @click="editItem(item)">mdi-pencil</v-icon>
       <v-icon small @click="deleteItem(item)">mdi-delete</v-icon>
     </template>
-    <template v-slot:no-data>No goals</template>
+    <template v-slot:no-data>No activities</template>
   </v-data-table>
 </template>
 
 <script>
+
 export default {
-  name: "UserGoals",
+  name: "UserActivities",
   data: () => ({
-    loadingGoals: false,
+    loadingActivities: false,
     dialog: false,
     dialogDelete: false,
     headers: [
-      {text: 'Activity', value: 'activityId'},
-      {text: 'Target', value: 'target'},
-      {text: 'Progress', value: 'current'},
+      {text: 'Description', value: 'description'},
+      {text: 'Duration (minutes)', value: 'duration'},
+      {text: 'Calories burned', value: 'calories'},
+      {text: 'Date', value: 'started'},
       {text: 'Actions', value: 'actions', sortable: false},
     ],
-    goals: [],
     activities: [],
     editedIndex: -1,
     editedItem: {
-      target: null,
-      current: 0,
-      unit: "minutes",
-      activityId: 0
+      calories: 0,
+      description: "",
+      duration: 0,
+      started: new Date().toISOString().split("T")[0]
     },
     defaultItem: {
-      target: null,
-      current: 0,
-      unit: "minutes",
-      activityId: 0
+      calories: 0,
+      description: "",
+      duration: 0,
+      started: new Date().toISOString().split("T")[0]
     },
   }),
 
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? 'New Goal' : 'Edit Goal'
-    }
+      return this.editedIndex === -1 ? 'New Activity' : 'Edit Activity'
+    },
   },
 
   watch: {
@@ -119,49 +107,40 @@ export default {
     dialogDelete(val) {
       val || this.closeDelete()
     },
-    loadingGoals(val) {
-      this.$emit('loadingGoals', val)
+    loadingActivities(val) {
+      this.$emit('onLoading', val)
     }
   },
 
   created() {
-    this.setupData()
+    this.activities = this.$actions.getActivities()
   },
 
   updated() {
-    this.setupData()
+    this.activities = this.$actions.getActivities()
   },
 
   methods: {
 
-    setupData() {
-      this.goals = this.$actions.getGoals()
-      this.activities = this.$actions.getActivities()
-    },
-
-    activityName(id) {
-      let activity = this.$actions.getActivities().find(a => a.id === id)
-      return activity ? activity.description : ""
-    },
-
     editItem(item) {
-      this.editedIndex = this.goals.indexOf(item)
+      this.editedIndex = this.activities.indexOf(item)
       this.editedItem = Object.assign({}, item)
       this.dialog = true
     },
 
     deleteItem(item) {
-      this.editedIndex = this.goals.indexOf(item)
+      this.editedIndex = this.activities.indexOf(item)
       this.editedItem = Object.assign({}, item)
       this.dialogDelete = true
     },
 
     async deleteItemConfirm() {
-      this.loadingGoals = true
+      this.loadingActivities = true
       this.closeDelete()
-      await this.$axios.delete("api/goals/" + this.goals[this.editedIndex].id)
+      await this.$axios.delete("api/activities/" + this.activities[this.editedIndex].id)
+      await this.$actions.reloadActivities()
       await this.$actions.reloadGoals()
-      this.loadingGoals = false
+      this.loadingActivities = false
     },
 
     close() {
@@ -181,20 +160,21 @@ export default {
     },
 
     async save() {
-      this.loadingGoals = true
+      this.loadingActivities = true
       this.close()
       let body = {
-        userId: this.$session.get('user-id'), target: this.editedItem.target,
-        current: this.editedItem.current, unit: this.editedItem.unit,
-        activityId: this.editedItem.activityId
+        userId: this.$session.get('user').id, description: this.editedItem.description,
+        duration: this.editedItem.duration, started: new Date(this.editedItem.started).toISOString(),
+        calories: this.editedItem.calories
       }
       if (this.editedIndex > -1) {
-        await this.$axios.patch("api/goals/" + this.goals[this.editedIndex].id, body)
+        await this.$axios.patch("api/activities/" + this.activities[this.editedIndex].id, body)
       } else {
-        await this.$axios.post("api/goals", body)
+        await this.$axios.post("api/activities", body)
       }
+      await this.$actions.reloadActivities()
       await this.$actions.reloadGoals()
-      this.loadingGoals = false
+      this.loadingActivities = false
     }
   }
 }
