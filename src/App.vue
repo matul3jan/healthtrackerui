@@ -82,12 +82,13 @@ export default {
       this.$axios.defaults.headers.common['Authorization'] = this.$session.get('auth')
       if (this.checkSession()) {
         this.loading = true
-        await this.$actions.loadStore(this.$session.get('user-id'))
+        await this.$actions.loadStore()
         this.loading = false
       }
     },
     logout() {
       this.$session.destroy()
+      this.activeTab = 0
       this.$forceUpdate()
     },
     async onLogin(data, auth) {

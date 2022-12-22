@@ -1,15 +1,15 @@
 import Vue from "vue";
 
-const store = Vue.observable({userId: null, activities: [], goals: []})
+const store = Vue.observable({activities: [], goals: []})
 
 async function fetchActivities() {
-    let url = `/api/users/${store.userId}/activities`;
+    let url = `/api/users/${Vue.prototype.$session.get('user-id')}/activities`;
     store.activities = (await Vue.prototype.$axios.get(url)).data
     store.activities.map(a => a.started = a.started.split("T")[0])
 }
 
 async function fetchGoals() {
-    let url = `/api/users/${store.userId}/goals`;
+    let url = `/api/users/${Vue.prototype.$session.get('user-id')}/goals`;
     store.goals = (await Vue.prototype.$axios.get(url)).data
     store.goals.map(g => g.percent = ((g.current * 100) / g.target).toFixed(0))
 }

@@ -9,7 +9,7 @@ module.exports = defineConfig({
         ],
         proxy: {
             '/api': {
-                target: 'https://healthtrackerrest-production-9cc1.up.railway.app',
+                target: 'http://localhost:7001/',
                 changeOrigin: true
             }
         }
