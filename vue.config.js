@@ -3,7 +3,6 @@ module.exports = defineConfig({
     transpileDependencies: [
         'vuetify'
     ],
-    lintOnSave: false,
     publicPath: process.env.NODE_ENV === 'production' ? 'dist' : '',
     devServer: {
         allowedHosts: 'all',
