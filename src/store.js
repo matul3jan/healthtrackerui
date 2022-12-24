@@ -15,7 +15,7 @@ async function fetchGoals() {
 }
 
 export default {
-    setupSession(user) {
+    startSession(user) {
         Vue.prototype.$session.start()
         Vue.prototype.$session.set('user', user)
         Vue.prototype.$session.set('auth', 'Basic ' + btoa(user.email + ":" + user.password))

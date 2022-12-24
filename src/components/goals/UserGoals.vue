@@ -64,8 +64,8 @@
       {{ item.target + " " + item.unit }}
     </template>
     <template v-slot:[`item.current`]="{ item }">
-      <v-progress-linear :background-opacity="0.3" :buffer-value="100" :height="25" :width="150"
-                         :value="item.percent" color="success"
+      <v-progress-linear :background-opacity="0.2" :buffer-value="100" :height="25" :width="150"
+                         :value="item.percent" color="green"
       ><strong>{{ item.percent }}%</strong></v-progress-linear>
     </template>
     <template v-slot:[`item.actions`]="{ item }">
