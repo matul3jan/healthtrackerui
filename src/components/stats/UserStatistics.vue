@@ -1,0 +1,74 @@
+<template>
+  <div>
+    <v-row justify="space-around">
+      <v-col cols="4" class="d-flex justify-center">
+        <StatsCard :value="bmi" text="BMI" icon="mdi-scale" :gradient-index="5" unit="kg/m2" :loading="loading"/>
+      </v-col>
+      <v-col cols="4" class="d-flex justify-center">
+        <StatsCard :value="height" text="Height" icon="mdi-human-male-height" unit="ft' in''" :gradient-index="1"
+                   :loading="loading"/>
+      </v-col>
+      <v-col cols="4" class="d-flex justify-center">
+        <StatsCard :value="weight" text="Weight" icon="mdi-scale-bathroom" unit="kg" :gradient-index="4"
+                   :loading="loading" :ideal="idealWeight"/>
+      </v-col>
+    </v-row>
+    <v-row>
+      <GoalSlider class="ma-5"/>
+    </v-row>
+    <v-row>
+      <v-col cols="6">
+        <CalorieChart class="ml-12"/>
+      </v-col>
+      <v-col cols="6">
+        <FluidIntake :value="fluidIntake" :loading="loading" class="mx-auto"/>
+      </v-col>
+    </v-row>
+  </div>
+</template>
+
+<script>
+import StatsCard from "@/components/stats/StatsCard"
+import CalorieChart from "@/components/stats/CalorieChart"
+import FluidIntake from "@/components/stats/FluidIntake"
+import GoalSlider from "@/components/stats/GoalSlider";
+
+export default {
+  name: "UserStatistics",
+  components: {GoalSlider, FluidIntake, StatsCard, CalorieChart},
+  props: {},
+  data: () => ({
+    bmi: "",
+    height: "",
+    weight: "",
+    idealWeight: "",
+    fluidIntake: 0,
+    loading: "secondary"
+  }),
+  created() {
+    this.fetchStats()
+  },
+  methods: {
+    async fetchStats() {
+      const user = this.$session.get('user')
+      const stats = (await this.$axios.get("api/users/" + user.id + "/stats")).data
+      this.bmi = stats.bmi
+      this.idealWeight = stats.idealWeight
+      this.fluidIntake = parseInt(stats.fluidIntake)
+      this.height = this.toFeet(user.height)
+      this.weight = user.weight.toString()
+      this.loading = ""
+    },
+    toFeet(n) {
+      const realFeet = ((n * 0.393700) / 12)
+      const feet = Math.floor(realFeet)
+      const inches = Math.round((realFeet - feet) * 12)
+      return feet + "′" + inches + "′′"
+    }
+  }
+}
+</script>
+
+<style scoped>
+
+</style>

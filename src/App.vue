@@ -35,18 +35,18 @@ export default {
     WelcomeScreen
   },
   data: () => ({
-    activeTab: 3,
+    activeTab: 0,
     loading: false,
     saving: false
   }),
   created() {
-    this.setupStore()
+    this.setupApplication()
   },
   methods: {
     checkSession() {
       return this.$session.exists()
     },
-    async setupStore() {
+    async setupApplication() {
       this.$axios.defaults.headers.common['Authorization'] = this.$session.get('auth')
       if (this.checkSession()) {
         this.loading = true
@@ -56,13 +56,13 @@ export default {
     },
     logout() {
       this.$session.destroy()
-      this.activeTab = 0
       this.$forceUpdate()
     },
     async onLogin(user) {
+      this.activeTab = 0
       this.loading = true
-      this.$actions.setupSession(user)
-      await this.setupStore()
+      this.$actions.startSession(user)
+      await this.setupApplication()
       this.loading = false
     },
     onLoading(val) {
