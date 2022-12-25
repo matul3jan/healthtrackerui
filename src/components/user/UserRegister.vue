@@ -1,7 +1,6 @@
 <template>
   <v-card :height="isProfile ? '90vh' : null">
     <v-snackbar :value="loading" color="success" top app>Successful!</v-snackbar>
-    <v-snackbar v-model="noChanges" color="error" app>No changes to save!</v-snackbar>
     <v-card-text>
       <v-form ref="registerForm" v-model="valid" lazy-validation>
         <v-row justify="space-around">
@@ -38,7 +37,8 @@
                           @click:append="show = !show"/>
           </v-col>
           <v-col :cols="isProfile ? 3 : 12" class="d-flex justify-center">
-            <v-btn :loading="loading" x-large block :disabled="!valid || loading" color="success"
+            <v-btn :loading="loading" x-large block :disabled="!valid || loading || (isProfile && anyChanges())"
+                   color="success"
                    @click="validateRegisterForm">
               {{ isProfile ? "Save" : "Register" }}
             </v-btn>
@@ -72,7 +72,6 @@ export default {
     valid: true,
     show: false,
     loading: false,
-    noChanges: false,
     name: "",
     gender: "",
     age: "",
@@ -100,6 +99,15 @@ export default {
     }
   },
   methods: {
+    anyChanges() {
+      const user = this.$actions.userActions.getUser()
+      return this.name === user.name &&
+          this.email === user.email &&
+          +this.age === +user.age &&
+          this.gender.charAt(0) === user.gender &&
+          +this.height === +user.height &&
+          +this.weight === +user.weight
+    },
     async validateRegisterForm() {
       if (this.$refs.registerForm.validate()) {
         this.loading = true
@@ -109,12 +117,7 @@ export default {
         }
         if (this.isProfile) {
           body.id = this.user.id
-          if (Object.entries(body).sort().toString() === Object.entries(this.user).sort().toString()) {
-            this.noChanges = true
-            setTimeout(() => this.noChanges = false, 2000)
-          } else {
-            await this.$actions.userActions.updateUser(body)
-          }
+          await this.$actions.userActions.updateUser(body)
         } else {
           await axios.post('api/users', body)
           this.$refs.registerForm.reset()

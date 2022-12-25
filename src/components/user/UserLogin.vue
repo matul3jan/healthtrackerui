@@ -48,15 +48,18 @@ export default {
   methods: {
     validateLoginForm() {
       if (this.$refs.loginForm.validate()) {
+        this.loading = true
         axios.post('api/users/check', {
           email: this.loginEmail, password: this.loginPassword, name: "", gender: "", age: "",
           height: 0, weight: 0
         }).then(response => {
           this.$emit('login', response.data)
+          this.loading = false
         }).catch(() => {
           this.wrong = true
           this.$refs.loginForm.reset()
           setTimeout(() => this.wrong = false, 2000)
+          this.loading = false
         })
       }
     }
