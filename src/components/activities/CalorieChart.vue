@@ -1,5 +1,5 @@
 <template>
-  <Bar v-if="chartData != null" :data="chartData" :options="chartOptions"/>
+  <Bar :data="getChartData()" :options="chartOptions"/>
 </template>
 
 <script>
@@ -11,11 +11,7 @@ ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 export default {
   name: 'CalorieChart',
   components: {Bar},
-  mounted() {
-    this.setupChartData()
-  },
   data: () => ({
-    chartData: null,
     chartOptions: {
       scales: {
         x: {
@@ -47,9 +43,9 @@ export default {
     }
   }),
   methods: {
-    setupChartData() {
+    getChartData() {
       let map = new Map()
-      const activities = this.$actions.getActivities().slice() // do not modify original activities
+      const activities = this.$actions.activityActions.getActivities().slice() // do not modify original activities
 
       activities.forEach(a => {
         const date = new Date(a.started).toLocaleDateString("en-GB", {day: "numeric", month: "short", year: "numeric"})
@@ -62,7 +58,7 @@ export default {
 
       map = new Map([...map.entries()].sort()) // sort map by date
 
-      this.chartData = {
+      return {
         labels: [...map.keys()],
         datasets: [{
           label: 'Calories',

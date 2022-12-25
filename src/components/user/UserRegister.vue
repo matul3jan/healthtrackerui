@@ -50,11 +50,12 @@
 </template>
 
 <script>
+import axios from "axios"
+
 export default {
   name: "UserRegister",
   props: {
-    isProfile: Boolean,
-    user: Object
+    isProfile: Boolean
   },
   mounted() {
     if (this.isProfile) {
@@ -92,7 +93,10 @@ export default {
   }),
   computed: {
     passwordMatch() {
-      return () => this.password === this.verify || "Password must match";
+      return () => this.password === this.verify || "Password must match"
+    },
+    user() {
+      return this.$actions.userActions.getUser()
     }
   },
   methods: {
@@ -109,11 +113,10 @@ export default {
             this.noChanges = true
             setTimeout(() => this.noChanges = false, 2000)
           } else {
-            await this.$axios.patch('api/users/' + this.$session.get('user').id, body)
-            this.$session.set('user', body)
+            await this.$actions.userActions.updateUser(body)
           }
         } else {
-          await this.$axios.post('api/users', body)
+          await axios.post('api/users', body)
           this.$refs.registerForm.reset()
           this.$emit('registered')
         }

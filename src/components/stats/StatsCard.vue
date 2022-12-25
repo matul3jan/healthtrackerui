@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import SparkLine from "@/components/stats/SparkLine";
+import SparkLine from "@/components/stats/SparkLine"
 
 export default {
   name: "StatsCard",

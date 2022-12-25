@@ -2,15 +2,15 @@
   <div>
     <v-row justify="space-around">
       <v-col cols="4" class="d-flex justify-center">
-        <StatsCard :value="bmi" text="BMI" icon="mdi-scale" :gradient-index="5" unit="kg/m2" :loading="loading"/>
+        <StatsCard :value="stats.bmi" text="BMI" icon="mdi-scale" :gradient-index="5" unit="kg/m2"/>
       </v-col>
       <v-col cols="4" class="d-flex justify-center">
-        <StatsCard :value="height" text="Height" icon="mdi-human-male-height" unit="ft' in''" :gradient-index="1"
-                   :loading="loading"/>
+        <StatsCard :value="stats.height" text="Height" icon="mdi-human-male-height" unit="ft' in''"
+                   :gradient-index="1"/>
       </v-col>
       <v-col cols="4" class="d-flex justify-center">
-        <StatsCard :value="weight" text="Weight" icon="mdi-scale-bathroom" unit="kg" :gradient-index="4"
-                   :loading="loading" :ideal="idealWeight"/>
+        <StatsCard :value="stats.weight" text="Weight" icon="mdi-scale-bathroom" unit="kg" :gradient-index="4"
+                   :ideal="stats.idealWeight"/>
       </v-col>
     </v-row>
     <v-row>
@@ -21,7 +21,7 @@
         <CalorieChart class="ml-12"/>
       </v-col>
       <v-col cols="6">
-        <FluidIntake :value="fluidIntake" :loading="loading" class="mx-auto"/>
+        <FluidIntake :value="stats.fluidIntake" class="mx-auto"/>
       </v-col>
     </v-row>
   </div>
@@ -29,36 +29,33 @@
 
 <script>
 import StatsCard from "@/components/stats/StatsCard"
-import CalorieChart from "@/components/stats/CalorieChart"
+import CalorieChart from "@/components/activities/CalorieChart"
 import FluidIntake from "@/components/stats/FluidIntake"
-import GoalSlider from "@/components/stats/GoalSlider";
+import GoalSlider from "@/components/goals/GoalSlider"
 
 export default {
   name: "UserStatistics",
   components: {GoalSlider, FluidIntake, StatsCard, CalorieChart},
-  props: {},
   data: () => ({
     bmi: "",
     height: "",
     weight: "",
     idealWeight: "",
-    fluidIntake: 0,
-    loading: "secondary"
+    fluidIntake: 0
   }),
-  created() {
-    this.fetchStats()
+  computed: {
+    stats() {
+      const stats = this.$actions.userActions.getStats()
+      return {
+        bmi: stats.bmi,
+        idealWeight: stats.idealWeight,
+        fluidIntake: parseInt(stats.fluidIntake),
+        height: this.toFeet(stats.height),
+        weight: stats.weight.toString()
+      }
+    }
   },
   methods: {
-    async fetchStats() {
-      const user = this.$session.get('user')
-      const stats = (await this.$axios.get("api/users/" + user.id + "/stats")).data
-      this.bmi = stats.bmi
-      this.idealWeight = stats.idealWeight
-      this.fluidIntake = parseInt(stats.fluidIntake)
-      this.height = this.toFeet(user.height)
-      this.weight = user.weight.toString()
-      this.loading = ""
-    },
     toFeet(n) {
       const realFeet = ((n * 0.393700) / 12)
       const feet = Math.floor(realFeet)

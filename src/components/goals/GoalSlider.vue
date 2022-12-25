@@ -23,10 +23,10 @@ export default {
   name: "GoalSlider",
   methods: {
     getGoals() {
-      return this.$actions.getGoals()
+      return this.$actions.goalActions.getGoals()
     },
     activityName(id) {
-      let activity = this.$actions.getActivities().find(a => a.id === id)
+      const activity = this.$actions.activityActions.getActivities().find(a => a.id === id)
       return activity ? activity.description : ""
     },
   }

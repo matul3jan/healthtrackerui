@@ -78,7 +78,6 @@ export default {
       {text: 'Date', value: 'started'},
       {text: 'Actions', value: 'actions', sortable: false},
     ],
-    activities: [],
     editedIndex: -1,
     editedItem: {
       calories: 0,
@@ -98,6 +97,9 @@ export default {
     formTitle() {
       return this.editedIndex === -1 ? 'New Activity' : 'Edit Activity'
     },
+    activities() {
+      return this.$actions.activityActions.getActivities()
+    }
   },
 
   watch: {
@@ -110,14 +112,6 @@ export default {
     loadingActivities(val) {
       this.$emit('onLoading', val)
     }
-  },
-
-  created() {
-    this.activities = this.$actions.getActivities()
-  },
-
-  updated() {
-    this.activities = this.$actions.getActivities()
   },
 
   methods: {
@@ -137,9 +131,7 @@ export default {
     async deleteItemConfirm() {
       this.loadingActivities = true
       this.closeDelete()
-      await this.$axios.delete("api/activities/" + this.activities[this.editedIndex].id)
-      await this.$actions.reloadActivities()
-      await this.$actions.reloadGoals()
+      await this.$actions.activityActions.deleteActivity(this.activities[this.editedIndex])
       this.loadingActivities = false
     },
 
@@ -162,18 +154,17 @@ export default {
     async save() {
       this.loadingActivities = true
       this.close()
-      let body = {
-        userId: this.$session.get('user').id, description: this.editedItem.description,
-        duration: this.editedItem.duration, started: new Date(this.editedItem.started).toISOString(),
+      const body = {
+        description: this.editedItem.description,
+        duration: this.editedItem.duration,
+        started: new Date(this.editedItem.started).toISOString(),
         calories: this.editedItem.calories
       }
       if (this.editedIndex > -1) {
-        await this.$axios.patch("api/activities/" + this.activities[this.editedIndex].id, body)
+        await this.$actions.activityActions.updateActivity(this.activities[this.editedIndex], body)
       } else {
-        await this.$axios.post("api/activities", body)
+        await this.$actions.activityActions.addActivity(body)
       }
-      await this.$actions.reloadActivities()
-      await this.$actions.reloadGoals()
       this.loadingActivities = false
     }
   }

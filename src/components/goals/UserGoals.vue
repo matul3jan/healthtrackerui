@@ -89,8 +89,6 @@ export default {
       {text: 'Progress', value: 'current'},
       {text: 'Actions', value: 'actions', sortable: false},
     ],
-    goals: [],
-    activities: [],
     editedIndex: -1,
     editedItem: {
       target: null,
@@ -109,6 +107,12 @@ export default {
   computed: {
     formTitle() {
       return this.editedIndex === -1 ? 'New Goal' : 'Edit Goal'
+    },
+    goals() {
+      return this.$actions.goalActions.getGoals()
+    },
+    activities() {
+      return this.$actions.activityActions.getActivities()
     }
   },
 
@@ -124,23 +128,10 @@ export default {
     }
   },
 
-  created() {
-    this.setupData()
-  },
-
-  updated() {
-    this.setupData()
-  },
-
   methods: {
 
-    setupData() {
-      this.goals = this.$actions.getGoals()
-      this.activities = this.$actions.getActivities()
-    },
-
     activityName(id) {
-      let activity = this.$actions.getActivities().find(a => a.id === id)
+      const activity = this.$actions.activityActions.getActivities().find(a => a.id === id)
       return activity ? activity.description : ""
     },
 
@@ -159,8 +150,7 @@ export default {
     async deleteItemConfirm() {
       this.loadingGoals = true
       this.closeDelete()
-      await this.$axios.delete("api/goals/" + this.goals[this.editedIndex].id)
-      await this.$actions.reloadGoals()
+      await this.$actions.goalActions.deleteGoal(this.goals[this.editedIndex])
       this.loadingGoals = false
     },
 
@@ -183,17 +173,17 @@ export default {
     async save() {
       this.loadingGoals = true
       this.close()
-      let body = {
-        userId: this.$session.get('user').id, target: this.editedItem.target,
-        current: this.editedItem.current, unit: this.editedItem.unit,
+      const body = {
+        target: this.editedItem.target,
+        current: this.editedItem.current,
+        unit: this.editedItem.unit,
         activityId: this.editedItem.activityId
       }
       if (this.editedIndex > -1) {
-        await this.$axios.patch("api/goals/" + this.goals[this.editedIndex].id, body)
+        await this.$actions.goalActions.updateGoal(this.goals[this.editedIndex], body)
       } else {
-        await this.$axios.post("api/goals", body)
+        await this.$actions.goalActions.addGoal(body)
       }
-      await this.$actions.reloadGoals()
       this.loadingGoals = false
     }
   }

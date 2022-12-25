@@ -19,11 +19,11 @@
 </template>
 
 <script>
-import WelcomeScreen from './components/user/WelcomeScreen';
-import AppLoader from "@/components/dialogs/AppLoader";
-import AppSaver from "@/components/dialogs/AppSaver";
-import NavBar from "@/components/NavBar";
-import MainTabs from "@/components/MainTabs";
+import WelcomeScreen from './components/user/WelcomeScreen'
+import AppLoader from "@/components/dialogs/AppLoader"
+import AppSaver from "@/components/dialogs/AppSaver"
+import NavBar from "@/components/NavBar"
+import MainTabs from "@/components/MainTabs"
 
 export default {
   name: 'App',
@@ -44,24 +44,24 @@ export default {
   },
   methods: {
     checkSession() {
-      return this.$session.exists()
+      return this.$actions.commonActions.checkSession()
     },
     async setupApplication() {
-      this.$axios.defaults.headers.common['Authorization'] = this.$session.get('auth')
+      this.$actions.commonActions.setAxiosDefaults()
       if (this.checkSession()) {
         this.loading = true
-        await this.$actions.loadStore()
+        await this.$actions.commonActions.loadStore()
         this.loading = false
       }
     },
     logout() {
-      this.$session.destroy()
+      this.$actions.commonActions.destroySession()
       this.$forceUpdate()
     },
     async onLogin(user) {
       this.activeTab = 0
       this.loading = true
-      this.$actions.startSession(user)
+      this.$actions.commonActions.startSession(user)
       await this.setupApplication()
       this.loading = false
     },
@@ -69,5 +69,5 @@ export default {
       this.saving = val
     }
   }
-};
+}
 </script>

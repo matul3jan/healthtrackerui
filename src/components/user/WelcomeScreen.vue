@@ -1,5 +1,5 @@
 <template>
-  <v-tabs v-model="activeTab" icons-and-text grow style="width: 30vw; margin: 2vh auto">
+  <v-tabs v-model="activeTab" icons-and-text grow class="mx-auto mt-10" style="width: 30vw">
     <v-tab v-for="i in tabs" :key="i.name">
       <v-icon large>{{ i.icon }}</v-icon>
       <div class="caption py-1">{{ i.name }}</div>
@@ -15,8 +15,8 @@
 
 <script>
 
-import UserRegister from "@/components/user/UserRegister";
-import UserLogin from "@/components/user/UserLogin";
+import UserRegister from "@/components/user/UserRegister"
+import UserLogin from "@/components/user/UserLogin"
 
 export default {
   name: 'WelcomeScreen',

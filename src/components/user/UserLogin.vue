@@ -25,6 +25,8 @@
 </template>
 
 <script>
+import axios from "axios"
+
 export default {
   name: "UserLogin",
   data: () => ({
@@ -46,7 +48,7 @@ export default {
   methods: {
     validateLoginForm() {
       if (this.$refs.loginForm.validate()) {
-        this.$axios.post('api/users/check', {
+        axios.post('api/users/check', {
           email: this.loginEmail, password: this.loginPassword, name: "", gender: "", age: "",
           height: 0, weight: 0
         }).then(response => {
