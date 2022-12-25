@@ -40,6 +40,9 @@ export default {
     },
     activityActions: {
         getActivities() {
+            store.activities.forEach(a => {
+                if (a.started.includes("T")) a.started = a.started.split("T")[0]
+            })
             return store.activities
         },
         async addActivity(activity) {
@@ -54,16 +57,23 @@ export default {
         },
         async updateActivity(oldA, newA) {
             newA.userId = getSession().get('user').id
+            const oldDuration = oldA.duration
             await axios.patch("api/activities/" + oldA.id, newA)
             const index = store.activities.indexOf(oldA)
             store.activities[index].description = newA.description
             store.activities[index].duration = newA.duration
             store.activities[index].started = newA.started
             store.activities[index].calories = newA.calories
+            store.goals.forEach(g => {
+                if (g.activityId === oldA.id) {
+                    g.current = g.current + (newA.duration - oldDuration)
+                }
+            })
         }
     },
     goalActions: {
         getGoals() {
+            store.goals.map(g => g.percent = ((g.current * 100) / g.target).toFixed(0))
             return store.goals
         },
         async addGoal(goal) {
@@ -91,13 +101,11 @@ const getSession = () => Vue.prototype.$session
 async function fetchActivities() {
     const url = `/api/users/${getSession().get('user').id}/activities`
     store.activities = (await axios.get(url)).data
-    store.activities.map(a => a.started = a.started.split("T")[0])
 }
 
 async function fetchGoals() {
     const url = `/api/users/${getSession().get('user').id}/goals`
     store.goals = (await axios.get(url)).data
-    store.goals.map(g => g.percent = ((g.current * 100) / g.target).toFixed(0))
 }
 
 async function fetchStats() {
