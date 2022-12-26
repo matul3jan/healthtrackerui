@@ -4,9 +4,6 @@ module.exports = defineConfig({
         'vuetify'
     ],
     devServer: {
-        allowedHosts: [
-            'healthtrackerrest-production-9cc1.up.railway.app'
-        ],
         proxy: {
             '/api': {
                 target: 'http://localhost:7001/',
