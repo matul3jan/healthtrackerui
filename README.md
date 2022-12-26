@@ -1,24 +1,10 @@
-# healthtrackerui
+### This repository contains frontend UI for Health tracker application
 
-## Project setup
-```
-npm install
-```
+### [Live applicaiton](https://healthtrackerui-production.up.railway.app/)
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+ ### Features
+- User Session management
+- Dashboard with user statistics and chart
+- CRUD for Activities & Goals 
 
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+### Check [Wiki](https://github.com/matul3jan/healthtrackerui/wiki) for more details
