@@ -122,9 +122,6 @@ export default {
     },
     dialogDelete(val) {
       val || this.closeDelete()
-    },
-    loadingGoals(val) {
-      this.$emit('onLoading', val)
     }
   },
 

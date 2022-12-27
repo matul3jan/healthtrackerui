@@ -9,10 +9,10 @@
       <UserStatistics/>
     </v-tab-item>
     <v-tab-item>
-      <UserActivities v-on="$listeners"/>
+      <UserActivities/>
     </v-tab-item>
     <v-tab-item>
-      <UserGoals ref="goals" v-on="$listeners"/>
+      <UserGoals/>
     </v-tab-item>
     <v-tab-item class="mt-16">
       <UserRegister :is-profile="true"/>

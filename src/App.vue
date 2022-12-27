@@ -5,13 +5,11 @@
 
     <AppLoader :onlyIf="loading"/>
 
-    <AppSaver :onlyIf="saving"/>
-
     <NavBar v-if="!loading && checkSession()" @logout="logout"/>
 
     <v-main v-if="!loading && checkSession()">
       <v-container fluid class="pa-0 ma-0" style="height: 90vh">
-        <MainTabs @onLoading="onLoading" :active-tab="activeTab"/>
+        <MainTabs :active-tab="activeTab"/>
       </v-container>
     </v-main>
 
@@ -21,7 +19,6 @@
 <script>
 import WelcomeScreen from './components/user/WelcomeScreen'
 import AppLoader from "@/components/dialogs/AppLoader"
-import AppSaver from "@/components/dialogs/AppSaver"
 import NavBar from "@/components/NavBar"
 import MainTabs from "@/components/MainTabs"
 
@@ -30,14 +27,12 @@ export default {
   components: {
     MainTabs,
     NavBar,
-    AppSaver,
     AppLoader,
     WelcomeScreen
   },
   data: () => ({
     activeTab: 0,
-    loading: false,
-    saving: false
+    loading: false
   }),
   created() {
     this.setupApplication()
@@ -64,9 +59,6 @@ export default {
       this.$actions.commonActions.startSession(user)
       await this.setupApplication()
       this.loading = false
-    },
-    onLoading(val) {
-      this.saving = val
     }
   }
 }
